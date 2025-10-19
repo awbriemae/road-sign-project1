@@ -3,7 +3,7 @@ export default function QuestionPage({ q, index, selected, onSelect, disabled })
     <div>
         <h5>Question {index + 1} of 10</h5>
         <p>{q.text}</p>
-
+        
         <img
         src={q.image}
         alt={`Sign for question ${index + 1}`}

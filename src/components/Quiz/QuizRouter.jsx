@@ -11,6 +11,8 @@ import { getUserById, updateUser } from '../../utils/storage';
 const TOTAL_SECONDS = 180;
 const PASS_THRESHOLD = 8;
 
+
+// this is very tiring to do
 export default function QuizRouter({ userId }) {
     const navigate = useNavigate();
     const [questions] = useState(questionsData);
@@ -22,20 +24,20 @@ export default function QuizRouter({ userId }) {
     const [lastScore, setLastScore] = useState(null);
     const [showReview, setShowReview] = useState(false);
 
+    // this is to restet the quiz state when userid changes
     useEffect(() => {
-    // start fresh
-    setAnswers({});
-    setCurrentIndex(0);
-    setRunning(true);
-    setLocked(false);
-    setShowResults(false);
-    setShowReview(false);
+        setAnswers({});
+        setCurrentIndex(0);
+        setRunning(true);
+        setLocked(false);
+        setShowResults(false);
+        setShowReview(false);
     }, [userId]);
 
     function handleSelect(qid, optIndex) {
     setAnswers(prev => ({ ...prev, [qid]: optIndex }));
     }
-
+    // loop through and count. determine score this way
     function computeScore(a) {
     let s = 0;
     questions.forEach(q => {
@@ -45,40 +47,45 @@ export default function QuizRouter({ userId }) {
     return s;
     }
 
+    // this is to stop the user from submitting twice. in a normal test this wouldnt happen but the option is there if i wanna recreate this with some other type of theme
     function finalizeAttempt() {
-    if (locked) return;
-    setLocked(true);
-    setRunning(false);
-    const score = computeScore(answers);
-    setLastScore(score);
-    setShowResults(true);
+        if (locked) return;
+        setLocked(true);
+        setRunning(false);
+        const score = computeScore(answers);
+        setLastScore(score);
+        setShowResults(true);
 
-    // persist to user
-    const user = getUserById(userId);
-    if (user) {
-        const attempt = { dateISO: new Date().toISOString(), score, answers };
-        const updated = { ...user, attempts: [...(user.attempts || []), attempt] };
-        updateUser(updated);
-    }
+        // i dont know why i put in effort for this. I didnt need to do this but was fully convinced i did
+        // this is to persist the user
+        const user = getUserById(userId);
+        if (user) {
+            const attempt = { dateISO: new Date().toISOString(), score, answers };
+            const updated = { ...user, attempts: [...(user.attempts || []), attempt] };
+            updateUser(updated);
+        }
     }
 
+    // called when time is out
     function handleTimeout() {
-    finalizeAttempt();
+        finalizeAttempt();
     }
-
+    // called when quiz is pressed submiut
     function handleSubmitClick() {
-    finalizeAttempt();
+        finalizeAttempt();
     }
-
+    
+    // thius resets everything for a new attempt
     function handleRetry() {
-    setAnswers({});
-    setCurrentIndex(0);
-    setRunning(true);
-    setLocked(false);
-    setShowResults(false);
-    setShowReview(false);
+        setAnswers({});
+        setCurrentIndex(0);
+        setRunning(true);
+        setLocked(false);
+        setShowResults(false);
+        setShowReview(false);
     }
 
+    // this is hte check to see if the user passed
     const passed = lastScore !== null && lastScore >= PASS_THRESHOLD;
 
     return (
@@ -94,26 +101,26 @@ export default function QuizRouter({ userId }) {
         {!showResults && (
         <div>
             <QuestionPage
-            q={questions[currentIndex]}
-            index={currentIndex}
-            selected={answers[questions[currentIndex].id]}
-            onSelect={handleSelect}
-            disabled={locked}
+                q={questions[currentIndex]}
+                index={currentIndex}
+                selected={answers[questions[currentIndex].id]}
+                onSelect={handleSelect}
+                disabled={locked}
             />
 
             <div className="d-flex justify-content-between mt-3">
             <div>
                 <button
-                className="btn btn-outline-secondary me-2"
-                onClick={() => setCurrentIndex(i => Math.max(0, i - 1))}
-                disabled={currentIndex === 0 || locked}
+                    className="btn btn-outline-secondary me-2"
+                    onClick={() => setCurrentIndex(i => Math.max(0, i - 1))}
+                    disabled={currentIndex === 0 || locked}
                 >
                 Previous
                 </button>
                 <button
-                className="btn btn-outline-secondary"
-                onClick={() => setCurrentIndex(i => Math.min(questions.length - 1, i + 1))}
-                disabled={currentIndex === questions.length - 1 || locked}
+                    className="btn btn-outline-secondary"
+                    onClick={() => setCurrentIndex(i => Math.min(questions.length - 1, i + 1))}
+                    disabled={currentIndex === questions.length - 1 || locked}
                 >
                 Next
                 </button>
@@ -131,13 +138,14 @@ export default function QuizRouter({ userId }) {
         {showResults && (
         <div className="mt-3">
             <Results
-            score={lastScore}
-            total={questions.length}
-            passed={passed}
-            onRetry={handleRetry}
-            onReview={() => setShowReview(true)}
+                score={lastScore}
+                total={questions.length}
+                passed={passed}
+                onRetry={handleRetry}
+                onReview={() => setShowReview(true)}
             />
             {showReview && <ReviewWrong questions={questions} answers={answers} onClose={() => setShowReview(false)} />}
+            {/*these are morte navigation buttons */}
             {!passed && (
             <div className="mt-3">
                 <button className="btn btn-link" onClick={() => navigate('/profile')}>View attempt history</button>

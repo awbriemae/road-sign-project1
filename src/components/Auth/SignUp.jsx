@@ -8,7 +8,7 @@ export default function SignUp({ onSignUp }) {
     const [password, setPassword] = useState('');
     const [err, setErr] = useState('');
     const navigate = useNavigate();
-
+        
     function handleSubmit(e) {
     e.preventDefault();
     setErr('');
