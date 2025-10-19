@@ -1,0 +1,15 @@
+// src/index.scss
+@import './scss/main.scss';
+
+/* basic layout tweaks */
+body {
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+/* sign image style fallback */
+.sign-image {
+  background-repeat: no-repeat;
+  background-position: center;
+  display: inline-block;
+}
